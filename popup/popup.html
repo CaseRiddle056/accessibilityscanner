@@ -26,43 +26,65 @@
                 </button>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">94.8%</div>
-                    <div class="stat-label">Sites Fail</div>
+            <div class="score-section">
+                <div class="score-circle">
+                    72
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">51</div>
-                    <div class="stat-label">Avg Errors</div>
+                <div class="score-label">Accessibility Score</div>
+                <div class="score-status">Needs Improvement</div>
+            </div>
+
+            <div class="issues-grid">
+                <div class="issue-card critical">
+                    <div class="issue-number">8</div>
+                    <div class="issue-label">Critical</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">&lt;3s</div>
-                    <div class="stat-label">Scan Time</div>
+                <div class="issue-card serious">
+                    <div class="issue-number">15</div>
+                    <div class="issue-label">Serious</div>
+                </div>
+                <div class="issue-card moderate">
+                    <div class="issue-number">23</div>
+                    <div class="issue-label">Moderate</div>
                 </div>
             </div>
 
-            <div class="features">
-                <div class="features-title">Detection Features</div>
-                <div class="feature-item">
-                    <div class="feature-icon">✓</div>
-                    <span>Visual overlays with color coding</span>
+            <div class="results-section">
+                <div class="results-title">
+                    📋 Issues Found
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon">✓</div>
-                    <span>WCAG 2.1 & 2.2 compliance check</span>
+                
+                <div class="result-item critical">
+                    <div class="result-icon">🔴</div>
+                    <div class="result-content">
+                        <div class="result-title">Missing alt text on images</div>
+                        <div class="result-description">3 images without alternative text</div>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon">✓</div>
-                    <span>Actionable fix recommendations</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">✓</div>
-                    <span>Accessibility score dashboard</span>
-                </div>
-            </div>
 
-            <div id="results">
-                Ready to scan • Click button above to begin
+                <div class="result-item serious">
+                    <div class="result-icon">🟠</div>
+                    <div class="result-content">
+                        <div class="result-title">Insufficient color contrast</div>
+                        <div class="result-description">5 elements below 4.5:1 ratio</div>
+                    </div>
+                </div>
+
+                <div class="result-item moderate">
+                    <div class="result-icon">🔵</div>
+                    <div class="result-content">
+                        <div class="result-title">Form labels missing</div>
+                        <div class="result-description">2 inputs without associated labels</div>
+                    </div>
+                </div>
+
+                <div class="result-item critical">
+                    <div class="result-icon">🔴</div>
+                    <div class="result-content">
+                        <div class="result-title">Keyboard navigation blocked</div>
+                        <div class="result-description">Button not focusable via keyboard</div>
+                    </div>
+                </div>
             </div>
         </main>
         
