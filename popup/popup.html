@@ -3,23 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessibility Scanner</title>
+    <title>AccessibilityLens</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Accessibility Scanner</h1>
-            <p class="subtitle">Quickly check your page for accessibility issues</p>
+            <div class="logo-container">
+                <div class="logo-icon">🔍</div>
+                <div>
+                    <h1>AccessibilityLens</h1>
+                    <p class="subtitle">Real-time WCAG compliance scanner</p>
+                </div>
+            </div>
         </header>
+        
         <main>
-            <button id="scanBtn">Scan This Page</button>
-            <div id="results"></div>
+            <div class="scan-section">
+                <button id="scanBtn">
+                    <span>▶</span>
+                    <span>Scan Current Page</span>
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">94.8%</div>
+                    <div class="stat-label">Sites Fail</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">51</div>
+                    <div class="stat-label">Avg Errors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">&lt;3s</div>
+                    <div class="stat-label">Scan Time</div>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="features-title">Detection Features</div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Visual overlays with color coding</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>WCAG 2.1 & 2.2 compliance check</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Actionable fix recommendations</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <span>Accessibility score dashboard</span>
+                </div>
+            </div>
+
+            <div id="results">
+                Ready to scan • Click button above to begin
+            </div>
         </main>
+        
         <footer>
-            <small>&copy; 2025 Accessibility Scanner</small>
+            <small>Powered by axe-core | CSC-475 Project</small>
         </footer>
     </div>
+
+    <script src="popup.js"></script>
 </body>
-</html>
 </html>
