@@ -1,9 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "AccessibilityLens",
-  "version": "1.0.0",
-  "description": "Real-time web accessibility scanner with visual overlays and WCAG compliance checking.",
-  "action": {
-    "default_popup": "popup/popup.html"
-  }
+  "name": "Axe Accessibility Checker",
+  "version": "1.0",
+  "description": "Runs axe-core accessibility tests on the current page",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+   "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "lib/axe.min.js",
+        "lib/chart.min.js",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
