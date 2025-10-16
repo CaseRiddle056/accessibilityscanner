@@ -16,22 +16,106 @@ document.getElementById('scanBtn').addEventListener('click', async function() {
         if (!pageUrl) throw new Error('Unable to determine page URL. Open a tab to test or provide a URL.');
 
         // Ensure pagespeed helper is available (injected as window.__pagespeed)
-        if (!window.__pagespeed) {
-            // Dynamically load the helper script from extension files
-            const script = document.createElement('script');
-            script.src = chrome.runtime.getURL('lib/pagespeed.js');
-            document.head.appendChild(script);
-            // wait for it to attach
-            await new Promise((resolve, reject) => {
-                script.onload = () => resolve();
-                script.onerror = () => reject(new Error('Failed to load pagespeed helper'));
-            });
+        async function ensurePagespeedHelper(timeout = 2000) {
+            if (window.__pagespeed && typeof window.__pagespeed.runPageSpeedTest === 'function') return true;
+            // try injecting script
+            try {
+                const script = document.createElement('script');
+                script.src = chrome.runtime.getURL('lib/pagespeed.js');
+                document.head.appendChild(script);
+            } catch (e) {
+                console.warn('Failed to append pagespeed script tag:', e);
+            }
+
+            const interval = 100;
+            const start = Date.now();
+            while (Date.now() - start < timeout) {
+                if (window.__pagespeed && typeof window.__pagespeed.runPageSpeedTest === 'function') return true;
+                await new Promise(r => setTimeout(r, interval));
+            }
+            return !!(window.__pagespeed && typeof window.__pagespeed.runPageSpeedTest === 'function');
         }
 
-    // retrieve stored API key (if any)
-    const stored = await new Promise((res) => chrome.storage && chrome.storage.sync && chrome.storage.sync.get(['pagespeedApiKey'], res));
-    const apiKey = stored?.pagespeedApiKey || '';
-    const json = await window.__pagespeed.runPageSpeedTest(pageUrl, apiKey, { strategy: 'desktop' });
+    const helperReady = await ensurePagespeedHelper(3000);
+
+        // retrieve stored API key (if any)
+        const stored = await new Promise((res) => chrome.storage && chrome.storage.sync && chrome.storage.sync.get(['pagespeedApiKey'], res));
+        const apiKey = stored?.pagespeedApiKey || '';
+
+        if (!helperReady) {
+            // show friendly fallback and allow a demo run so popup is useful even when helper fails to load
+            resultsSection.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-weight:600; margin-bottom:8px;">Could not load PageSpeed helper</div>
+                    <div style="font-size:13px; color:#6b7280; margin-bottom:10px;">You can still run a demo to preview the UI and highlights.</div>
+                    <div style="display:flex; gap:8px; justify-content:center;">
+                        <button id="demoRunBtn" style="padding:8px 12px; border-radius:6px; background:#1a73e8; color:#fff; border:none;">Run Demo</button>
+                        <button id="cancelBtn" style="padding:8px 12px; border-radius:6px; background:#f3f4f6;">Cancel</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('demoRunBtn').addEventListener('click', async () => {
+                // build a small demo failingAudits list and reuse highlighting logic
+                const demoAudits = [
+                    { id: 'demo-missing-alt', title: 'Images missing alt text', help: 'Some images are missing alt text', displayValue: '3 elements' },
+                    { id: 'demo-contrast', title: 'Low color contrast', help: 'Elements with insufficient contrast', displayValue: '5 elements' }
+                ];
+
+                // show demo results
+                const issuesGrid = document.querySelector('.issues-grid');
+                if (issuesGrid) {
+                    issuesGrid.innerHTML = `
+                        <div class="issue-card critical"><div class="issue-number">2</div><div class="issue-label">Failing Audits</div></div>
+                        <div class="issue-card serious"><div class="issue-number">0</div><div class="issue-label">Warnings</div></div>
+                        <div class="issue-card moderate"><div class="issue-number">0</div><div class="issue-label">Info</div></div>
+                    `;
+                }
+
+                resultsSection.innerHTML = `
+                    <div class="results-title">📋 Demo Failing Accessibility Audits (2)</div>
+                    <div class="result-item critical"><div class="result-icon">⚠️</div><div class="result-content"><div class="result-title">Images missing alt text</div><div class="result-description">Some images are missing alt text — 3 elements</div></div></div>
+                    <div class="result-item critical"><div class="result-icon">⚠️</div><div class="result-content"><div class="result-title">Low color contrast</div><div class="result-description">Elements with insufficient contrast — 5 elements</div></div></div>
+                `;
+
+                // attempt to inject content script and highlight generic selectors for demo
+                try {
+                    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                    const activeTab = tabs && tabs[0];
+                    if (activeTab && activeTab.id) {
+                        await chrome.scripting.executeScript({ target: { tabId: activeTab.id }, files: ['content/content.js'] });
+                        // send a couple of generic selectors that usually match elements
+                        chrome.tabs.sendMessage(activeTab.id, { type: 'highlight', highlights: [
+                            { selector: 'img:not([alt])', message: 'Missing alt text (demo)', auditId: 'demo-missing-alt' },
+                            { selector: 'a', message: 'Sample link (demo)', auditId: 'demo-contrast' }
+                        ] }, (resp) => console.log('Demo highlight resp', resp));
+                    }
+                } catch (e) {
+                    console.warn('Demo highlight failed', e);
+                }
+            });
+
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                resultsSection.innerHTML = '<div class="empty-state">Cancelled.</div>';
+            });
+
+            // stop further execution of real API run
+            btn.disabled = false;
+            btn.innerHTML = '<span>▶</span><span>Scan This Page</span>';
+            return;
+        }
+
+        // call the helper (guarding against unexpected undefined)
+        if (!window.__pagespeed || typeof window.__pagespeed.runPageSpeedTest !== 'function') {
+            throw new Error('Pagespeed run function is not available.');
+        }
+
+        let json;
+        try {
+            json = await window.__pagespeed.runPageSpeedTest(pageUrl, apiKey, { strategy: 'desktop' });
+        } catch (callErr) {
+            throw new Error('PageSpeed API call failed: ' + (callErr && callErr.message ? callErr.message : String(callErr)));
+        }
 
         // --- Accessibility-specific display ---
         const accessibilityCategory = json.lighthouseResult?.categories?.accessibility;
@@ -225,5 +309,14 @@ window.addEventListener('DOMContentLoaded', () => {
             saveBtn.textContent = 'Saved';
             setTimeout(() => (saveBtn.textContent = 'Save'), 1200);
         });
+    });
+    // show global errors in the results area
+    window.addEventListener('error', (e) => {
+        const resultsSection = document.getElementById('results') || document.querySelector('.results-section');
+        if (resultsSection) resultsSection.innerHTML = `<div class="error">Error: ${e.message || String(e.error || e)}</div>`;
+    });
+    window.addEventListener('unhandledrejection', (ev) => {
+        const resultsSection = document.getElementById('results') || document.querySelector('.results-section');
+        if (resultsSection) resultsSection.innerHTML = `<div class="error">Unhandled: ${ev.reason?.message || String(ev.reason)}</div>`;
     });
 });
