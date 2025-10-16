@@ -1,3 +1,11 @@
 /* Options page styles */
-body { font-family: Arial, sans-serif; padding: 10px; }
-form { margin-top: 10px; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background:#f7f9fc; margin:0; padding:20px; }
+.container { max-width:640px; margin:0 auto; background:#fff; padding:18px; border-radius:10px; box-shadow:0 6px 18px rgba(10,20,40,0.06); }
+.field { margin-top:12px; }
+.field label { display:block; font-weight:600; margin-bottom:6px; }
+.field input { width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; }
+.actions { margin-top:14px; display:flex; gap:8px; }
+.actions button { padding:8px 12px; border-radius:8px; border:none; background:#1a73e8; color:#fff; cursor:pointer; font-weight:600; }
+.actions .secondary { background:#f3f4f6; color:#111; }
+.status { margin-top:12px; color:#16a34a; }
+.note { margin-top:12px; color:#6b7280; font-size:0.9rem; }

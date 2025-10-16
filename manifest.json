@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "Axe Accessibility Checker",
+  "name": "Accessibility Scanner",
   "version": "1.0",
-  "description": "Runs axe-core accessibility tests on the current page",
+  "description": "Run PageSpeed Insights tests and show summarized results",
   "permissions": ["scripting", "activeTab"],
   "host_permissions": ["<all_urls>"],
-   "content_scripts": [
+  "options_page": "options/options.html",
+  "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content/content.js"],
@@ -16,9 +17,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "lib/axe.min.js",
         "lib/chart.min.js",
-        "assets/*"
+        "assets/*",
+        "lib/pagespeed.js"
       ],
       "matches": ["<all_urls>"]
     }

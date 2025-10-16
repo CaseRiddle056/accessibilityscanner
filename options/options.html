@@ -7,14 +7,24 @@
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
-    <h2>Extension Options</h2>
-    <form>
-        <label>
-            <input type="checkbox" id="autoScan" /> Enable automatic scanning
-        </label>
-        <br>
-        <button type="submit">Save</button>
-    </form>
+    <div class="container">
+        <h1>Accessibility Scanner - Options</h1>
+        <p>Manage your Google PageSpeed API key used for running tests.</p>
+
+        <div class="field">
+            <label for="apiKey">PageSpeed API Key</label>
+            <input id="apiKey" type="password" placeholder="Enter API key" />
+        </div>
+
+        <div class="actions">
+            <button id="saveBtn">Save</button>
+            <button id="clearBtn" class="secondary">Clear</button>
+        </div>
+
+        <div id="status" class="status" aria-live="polite"></div>
+
+        <p class="note">Note: The API key is stored using <code>chrome.storage.sync</code>. For private keys you may prefer <code>storage.local</code>.</p>
+    </div>
     <script src="options.js"></script>
 </body>
 </html>
