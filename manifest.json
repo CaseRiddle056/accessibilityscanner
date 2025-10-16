@@ -3,7 +3,11 @@
   "name": "Accessibility Scanner",
   "version": "1.0",
   "description": "Run PageSpeed Insights tests and show summarized results",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "storage"],
+
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
   "host_permissions": ["<all_urls>"],
   "options_page": "options/options.html",
   
