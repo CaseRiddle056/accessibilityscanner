@@ -160,6 +160,16 @@ document.getElementById('scanBtn').addEventListener('click', async function() {
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
                 const activeTab = tabs && tabs[0];
                 if (activeTab && activeTab.id) {
+                    try {
+                        // Inject content script into the page before messaging (safe in many contexts)
+                        await chrome.scripting.executeScript({
+                            target: { tabId: activeTab.id },
+                            files: ['content/content.js']
+                        });
+                    } catch (injectErr) {
+                        console.warn('Could not inject content script:', injectErr);
+                    }
+
                     chrome.tabs.sendMessage(activeTab.id, { type: 'highlight', highlights }, (resp) => {
                         console.log('Highlight response', resp);
                     });
@@ -169,6 +179,14 @@ document.getElementById('scanBtn').addEventListener('click', async function() {
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
                 const activeTab = tabs && tabs[0];
                 if (activeTab && activeTab.id) {
+                    try {
+                        await chrome.scripting.executeScript({
+                            target: { tabId: activeTab.id },
+                            files: ['content/content.js']
+                        });
+                    } catch (injectErr) {
+                        console.warn('Could not inject content script for clearing highlights:', injectErr);
+                    }
                     chrome.tabs.sendMessage(activeTab.id, { type: 'clear-highlights' }, (resp) => {
                         console.log('Clear highlights response', resp);
                     });

@@ -1,7 +1,12 @@
 // content.js
-// content.js
 // Content script now listens for highlight messages from the popup and draws overlays
-console.log('Content script loaded. Ready to highlight accessibility issues.');
+if (window.__as_injected) {
+	console.log('Accessibility content script already injected.');
+} else {
+	window.__as_injected = true;
+	console.log('Content script loaded. Ready to highlight accessibility issues.');
+
+  
 
 const __as_overlays = [];
 
@@ -108,3 +113,4 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 		}
 	}
 });
+}
